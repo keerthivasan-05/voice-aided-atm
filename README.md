@@ -128,14 +128,32 @@ python3 -m unittest discover -s tests -v
 
 See [service tests](tests/test_services.py) and [controller tests](tests/test_controller.py).
 
-## Optional voice mode and project scope
+## Run and test voice mode on macOS
+
+From the project directory, install PortAudio with Homebrew and create a Python virtual environment for the microphone and text-to-speech dependencies. [PyAudio installation guide](https://people.csail.mit.edu/hubert/pyaudio/index.html)
 
 ```bash
-python3 -m pip install -r requirements-voice.txt
-python3 main.py --db ./interview-demo.sqlite3 --mode voice --language en
+brew install portaudio
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements-voice.txt
+python main.py --db ./voice-demo.sqlite3 --seed-demo --mode voice --language en
 ```
 
-SpeechRecognition sends microphone audio to Google's recognition endpoint. `pyttsx3` handles speech output, and Tamil playback depends on the voices installed on the machine. Recognition errors can fall back to keyboard input. The command parser uses a small English and Tamil grammar. Service error messages are in English, and text mode is the verified demo path.
+Allow microphone access if macOS prompts for it. Type account **`1001`** and PIN **`1234`** using the keyboard. After the app finishes each prompt, speak the next command.
+
+| Say | Expected result with a fresh database |
+| --- | --- |
+| “Balance” | The app reads out Rs 50,000. |
+| “Withdraw five hundred” | The app asks you to confirm Rs 500. |
+| “Yes” | The app confirms the withdrawal and reads out Rs 49,500. |
+| “Exit” | The session closes. |
+
+Look for `[recognized]` in Terminal to see the transcript. SpeechRecognition sends command audio to Google's recognition endpoint and requires internet access. If the app prints `Voice unavailable; type command:`, you can continue by typing. Check your connection and **System Settings → Privacy & Security → Microphone** before retrying.
+
+For Tamil, use `--language ta` and say “இருப்பு” for balance. `pyttsx3` handles speech output, and Tamil playback depends on the system's installed voices and configuration. The command parser uses a small English and Tamil grammar. Service errors appear in English. Text mode is the verified demo path.
+
+## Project scope
 
 This project models banking operations with demo data on one machine. Authentication is enforced by the CLI controller and the service trusts its local caller. SQLite's single-writer model suits the local workload. A deployed system would need service-side authorization and integrations for banking and physical ATM hardware.
 
