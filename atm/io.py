@@ -18,6 +18,8 @@ class VoiceIO(ConsoleIO):
             raise RuntimeError('Install requirements-voice.txt for microphone mode') from exc
         self.sr = sr
         self.recognizer = sr.Recognizer()
+        self.recognizer.operation_timeout = 8
+        self._calibrated = False
         self.engine = pyttsx3.init()
         self.language = 'ta-IN' if language == 'ta' else 'en-IN'
 
@@ -33,7 +35,10 @@ class VoiceIO(ConsoleIO):
         self.say(prompt)
         try:
             with self.sr.Microphone() as source:
-                self.recognizer.adjust_for_ambient_noise(source, duration=0.3)
+                if not self._calibrated:
+                    self.recognizer.adjust_for_ambient_noise(source, duration=0.3)
+                    self._calibrated = True
+                print('[listening]', flush=True)
                 audio = self.recognizer.listen(source, timeout=6, phrase_time_limit=6)
             command = self.recognizer.recognize_google(audio, language=self.language)
             print('[recognized]', command)

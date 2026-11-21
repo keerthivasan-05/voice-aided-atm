@@ -140,7 +140,7 @@ python -m pip install -r requirements-voice.txt
 python main.py --db ./voice-demo.sqlite3 --seed-demo --mode voice --language en
 ```
 
-Allow microphone access if macOS prompts for it. Type account **`1001`** and PIN **`1234`** using the keyboard. After the app finishes each prompt, speak the next command.
+Allow microphone access if macOS prompts for it. Type account **`1001`** and PIN **`1234`** using the keyboard. Wait for `[listening]` in Terminal before speaking. The app samples room noise before the first command and reuses that calibration throughout the session.
 
 | Say | Expected result with a fresh database |
 | --- | --- |
@@ -149,7 +149,7 @@ Allow microphone access if macOS prompts for it. Type account **`1001`** and PIN
 | “Yes” | The app confirms the withdrawal and reads out Rs 49,500. |
 | “Exit” | The session closes. |
 
-Look for `[recognized]` in Terminal to see the transcript. SpeechRecognition sends command audio to Google's recognition endpoint and requires internet access. If the app prints `Voice unavailable; type command:`, you can continue by typing. Check your connection and **System Settings → Privacy & Security → Microphone** before retrying.
+Look for `[recognized]` in Terminal to see the transcript. SpeechRecognition sends command audio to Google's recognition endpoint and requires internet access. The recognition request uses an eight-second network timeout. If the app prints `Voice unavailable; type command:`, you can continue by typing. Check your connection and **System Settings → Privacy & Security → Microphone** before retrying.
 
 For Tamil, use `--language ta` and say “இருப்பு” for balance. `pyttsx3` handles speech output, and Tamil playback depends on the system's installed voices and configuration. The command parser uses a small English and Tamil grammar. Service errors appear in English. Text mode is the verified demo path.
 
